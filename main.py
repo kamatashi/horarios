@@ -1,8 +1,15 @@
+'''
+A proposta do programa é calcular a média de tempo em que o usuário passa no ônibus e na universidade. 
+Esse programa pode ser expandido para outras atividades.
+Consideramos que o aluno anota chegadas e saidas em uma planilha.
+'''
+
 import pandas as pd
 from datetime import datetime, timedelta
 
 
 
+# Funções para manipulação da informações
 def converterTempo(tempo_str):
     return pd.to_datetime(tempo_str, format='%H:%M:%S').time()
 
@@ -32,20 +39,20 @@ def calcularTempo(linha, inicio, fim):
 
 
 
-
+# Manipulação das células
 df = pd.read_csv("horarios.csv")
 df.columns = df.columns.str.strip()
-#print("Colunas encontradas:", df.columns.tolist())
 
-df['saida_casa'] = df['saida_casa'].apply(converterTempo)
-df['chegada_uni'] = df['chegada_uni'].apply(converterTempo)
-df['saida_uni']   = df['saida_uni'].apply(converterTempo)
-df['chegada_casa'] = df['chegada_casa'].apply(converterTempo)
+df['saida casa'] = df['saida casa'].apply(converterTempo)
+df['chegada universidade'] = df['chegada universidade'].apply(converterTempo)
+df['saida universidade']   = df['saida universidade'].apply(converterTempo)
+df['chegada casa'] = df['chegada casa'].apply(converterTempo)
 
 
-temposIda = df.apply(calcularTempo, args=('saida_casa', 'chegada_uni'), axis=1)
-temposVolta = df.apply(calcularTempo, args=('saida_uni', 'chegada_casa'), axis=1)
-temposUni = df.apply(calcularTempo, args=('chegada_uni', 'saida_uni'), axis=1)
+# Descobrindo o tempo nas atividades e cálculo da média
+temposIda = df.apply(calcularTempo, args=('saida casa', 'chegada universidade'), axis=1)
+temposVolta = df.apply(calcularTempo, args=('saida universidade', 'chegada casa'), axis=1)
+temposUni = df.apply(calcularTempo, args=('chegada universidade', 'saida universidade'), axis=1)
 
 temposDeslocamento = temposIda + temposVolta
 
@@ -57,7 +64,6 @@ df['Tempo no Ônibus'] = temposDeslocamento
 mediaTempoUni = df['Tempo na Universidade'].mean()
 mediaTempoOnibus = df['Tempo no Ônibus'].mean()
 
-# print("Resumo dos tempos calculados:")
-# print(df[['Tempo no Ônibus', 'Tempo na Universidade']])
+# Apresentação das informações descobertas
 print('\n\nMédia de tempo em ônibus: ' + formatarTimedelta(mediaTempoOnibus))
 print('Média de tempo na Universidade: ' + formatarTimedelta(mediaTempoUni))
