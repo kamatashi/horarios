@@ -3,42 +3,61 @@ from datetime import datetime, timedelta
 
 
 
-def converter_tempo(tempo_str):
+def converterTempo(tempo_str):
     return pd.to_datetime(tempo_str, format='%H:%M:%S').time()
+
+
+def tempoDatetime(tempo):
+    return datetime.combine(datetime.min, tempo)
+
+
+def calcularDiferenca(inicio, fim):
+    dtInicio = tempoDatetime(inicio)
+    dtFim = tempoDatetime(fim)
+    if dtFim < dtInicio:
+        dtFim += timedelta(days=1)
+    return dtFim - dtInicio
+
+
+def formatarTimedelta(dado):
+    totalSegundos = int(dado.total_seconds())
+    horas = totalSegundos // 3600
+    minutos = (totalSegundos % 3600) // 60
+    segundos = totalSegundos % 60
+    return f"{horas:02d}:{minutos:02d}:{segundos:02d}"
+
+
+def calcularTempo(linha, inicio, fim):
+    return calcularDiferenca(linha[inicio], linha[fim])
+
+
 
 
 df = pd.read_csv("horarios.csv")
 df.columns = df.columns.str.strip()
-print("Colunas encontradas:", df.columns.tolist())
+#print("Colunas encontradas:", df.columns.tolist())
 
-df['saida_casa'] = df['saida_casa'].apply(converter_tempo)
-df['chegada_uni'] = df['chegada_uni'].apply(converter_tempo)
-df['saida_uni']   = df['saida_uni'].apply(converter_tempo)
-df['chegada_casa'] = df['chegada_casa'].apply(converter_tempo)
+df['saida_casa'] = df['saida_casa'].apply(converterTempo)
+df['chegada_uni'] = df['chegada_uni'].apply(converterTempo)
+df['saida_uni']   = df['saida_uni'].apply(converterTempo)
+df['chegada_casa'] = df['chegada_casa'].apply(converterTempo)
 
-def tempo_datetime(tempo):
-    return datetime.combine(datetime.min, tempo)
 
-def calcular_diferenca(inicio, fim):
-    dt_inicio = tempo_datetime(inicio)
-    dt_fim = tempo_datetime(fim)
-    if dt_fim < dt_inicio:
-        dt_fim += timedelta(days=1)
-    return dt_fim - dt_inicio
+temposIda = df.apply(calcularTempo, args=('saida_casa', 'chegada_uni'), axis=1)
+temposVolta = df.apply(calcularTempo, args=('saida_uni', 'chegada_casa'), axis=1)
+temposUni = df.apply(calcularTempo, args=('chegada_uni', 'saida_uni'), axis=1)
 
-def calcular_tempo(linha, inicio, fim):
-    return calcular_diferenca(linha[inicio], linha[fim])
+temposDeslocamento = temposIda + temposVolta
 
-tempos_ida = df.apply(calcular_tempo, args=('saida_casa', 'chegada_uni'), axis=1)
-tempos_volta = df.apply(calcular_tempo, args=('saida_uni', 'chegada_casa'), axis=1)
-tempos_uni = df.apply(calcular_tempo, args=('chegada_uni', 'saida_uni'), axis=1)
+df['Tempo de Ida'] = temposIda
+df['Tempo de Volta'] = temposVolta
+df['Tempo na Universidade'] = temposUni
+df['Tempo no Ônibus'] = temposDeslocamento
 
-tempos_deslocamento = tempos_ida + tempos_volta
+mediaTempoUni = df['Tempo na Universidade'].mean()
+mediaTempoOnibus = df['Tempo no Ônibus'].mean()
 
-df['Tempo de Ida'] = tempos_ida
-df['Tempo de Volta'] = tempos_volta
-df['Tempo na Universidade'] = tempos_uni
-df['Tempo no Ônibus'] = tempos_deslocamento
-
-print("Resumo dos tempos calculados:")
-print(df[['Tempo no Ônibus', 'Tempo na Universidade']])
+# print("Resumo dos tempos calculados:")
+# print(df[['Tempo no Ônibus', 'Tempo na Universidade']])
+print('\n\nMédia de tempo em ônibus: ' + formatarTimedelta(mediaTempoOnibus))
+print('Média de tempo na Universidade: ' + formatarTimedelta(mediaTempoUni))
