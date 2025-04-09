@@ -63,7 +63,16 @@ df['Tempo no Ônibus'] = temposDeslocamento
 
 mediaTempoUni = df['Tempo na Universidade'].mean()
 mediaTempoOnibus = df['Tempo no Ônibus'].mean()
+maxTempoUni = df['Tempo na Universidade'].max()
+maxTempoOnibus = df['Tempo no Ônibus'].max()
+minTempoUni = df['Tempo na Universidade'].min()
+minTempoOnibus = df['Tempo no Ônibus'].min()
+
 
 # Apresentação das informações descobertas
 print('\n\nMédia de tempo em ônibus: ' + formatarTimedelta(mediaTempoOnibus))
 print('Média de tempo na Universidade: ' + formatarTimedelta(mediaTempoUni))
+print('Maxímo de tempo na universidade: ' + formatarTimedelta(maxTempoUni))
+print('Máximo de tempo em ônibus: ' + formatarTimedelta(maxTempoOnibus))
+print('Menor tempo na universidade: ' + formatarTimedelta(minTempoUni))
+print('Menor tempo em ônibus: ' + formatarTimedelta(minTempoOnibus))
