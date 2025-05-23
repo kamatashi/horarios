@@ -3,7 +3,6 @@ A proposta do programa é calcular a média de tempo em que o usuário passa no 
 Esse programa pode ser expandido para outras atividades.
 Consideramos que o aluno anota chegadas e saidas em uma planilha.
 '''
-
 import pandas as pd
 from datetime import datetime, timedelta
 
@@ -13,10 +12,8 @@ from datetime import datetime, timedelta
 def converterTempo(tempo_str):
     return pd.to_datetime(tempo_str, format='%H:%M:%S').time()
 
-
 def tempoDatetime(tempo):
     return datetime.combine(datetime.min, tempo)
-
 
 def calcularDiferenca(inicio, fim):
     dtInicio = tempoDatetime(inicio)
@@ -25,14 +22,12 @@ def calcularDiferenca(inicio, fim):
         dtFim += timedelta(days=1)
     return dtFim - dtInicio
 
-
 def formatarTimedelta(dado):
     totalSegundos = int(dado.total_seconds())
     horas = totalSegundos // 3600
     minutos = (totalSegundos % 3600) // 60
     segundos = totalSegundos % 60
     return f"{horas:02d}:{minutos:02d}:{segundos:02d}"
-
 
 def calcularTempo(linha, inicio, fim):
     return calcularDiferenca(linha[inicio], linha[fim])
